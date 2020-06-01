@@ -82,7 +82,8 @@ public class PlayerController : MonoBehaviour
 
         
 
-    //PoolManager.Instance.GetObj("Shadow");
+        if(isDashing)
+            PoolManager.Instance.GetObj("Shadow");
 }
 
     
