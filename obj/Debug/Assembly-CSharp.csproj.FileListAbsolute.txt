@@ -1,2 +1,4 @@
 E:\项目\demo\anabiosis\obj\Debug\Assembly-CSharp.csprojAssemblyReference.cache
 E:\项目\demo\anabiosis\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
+E:\项目\Git\GitHub\anabipsis1\obj\Debug\Assembly-CSharp.csprojAssemblyReference.cache
+E:\项目\Git\GitHub\anabipsis1\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
