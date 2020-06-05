@@ -13,8 +13,11 @@ public class PlayerController : MonoBehaviour
     private float xRaw;
     private float yRaw;
 
+
+    public float wallJumpLerp;
     public int speed;
-    public float slideSpeed;//下滑速度
+    public float airSpeed;
+    public float slideSpeed;//下滑速度   
     public float dashSpeed = 20;
 
     public bool canMove;//墙跳和冲刺期间不可移动
@@ -91,11 +94,23 @@ public class PlayerController : MonoBehaviour
 
     void GroundMovement()
     {
-        if (isDashing)
-            return;
+        
         if (!canMove)
             return;
-        rb.velocity = new Vector2(speed * x, rb.velocity.y);
+        if (!wallJumped)
+        {
+            if (coll.isOnGround)
+                rb.velocity = new Vector2(speed * x, rb.velocity.y);
+            else
+                rb.velocity = new Vector2(airSpeed * x, rb.velocity.y);
+        }
+            
+        else
+        {
+            Debug.Log("aaa");
+            rb.velocity = Vector2.Lerp(rb.velocity, (new Vector2(x * speed, 0)), wallJumpLerp*Time.fixedDeltaTime );
+        }
+            
 
     }
 
@@ -165,6 +180,8 @@ public class PlayerController : MonoBehaviour
         GetComponent<BetterJumping>().enabled = true;
         wallJumped = false;
         isDashing = false;
+
+        
     }
 
     IEnumerator GroundDash()//地面多次冲刺
