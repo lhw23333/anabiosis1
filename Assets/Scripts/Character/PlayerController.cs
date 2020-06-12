@@ -14,21 +14,21 @@ public class PlayerController : MonoBehaviour
     private float yRaw;
 
 
-    public float wallJumpLerp;
-    public int speed;
-    public float airSpeed;
+    public float wallJumpLerp;//冲刺速度向正常速度转化
+    public int speed;//地面移动速度
+    public float airSpeed;//空中移动速度
     public float slideSpeed;//下滑速度   
-    public float dashSpeed = 20;
+    public float dashSpeed = 20;//冲锋速度
 
     public bool canMove;//墙跳和冲刺期间不可移动
-    public bool isDashing;
+    public bool isDashing;//正在冲锋
     public bool hasDashed;//限制二次冲锋
     public bool wallJumped;
 
     [Header("跳跃参数")]
     public float yVelocity;
     public int jumpForce;
-    public LayerMask groundLayer;
+    public LayerMask groundLayer;//平台检测
     public Vector2 wallJumpForce;
 
     [Header("按键检测")]
@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
     public float footOffset;
     public float groundDistansce ;
 
-    private bool groundTouch;
+    private bool groundTouch;//限制二次冲锋
 
 
 
@@ -85,14 +85,14 @@ public class PlayerController : MonoBehaviour
 
         
 
-        if(isDashing)
+        if(isDashing)//冲锋残影
             PoolManager.Instance.GetObj("Shadow");
 }
 
     
 
 
-    void GroundMovement()
+    void GroundMovement()//地面移动**空中移动**冲刺后的速度转化**跳下平台
     {
         
         if (!canMove)
@@ -103,18 +103,19 @@ public class PlayerController : MonoBehaviour
                 rb.velocity = new Vector2(speed * x, rb.velocity.y);
             else
                 rb.velocity = new Vector2(airSpeed * x, rb.velocity.y);
-        }
-            
+        }          
         else
         {
-            Debug.Log("aaa");
             rb.velocity = Vector2.Lerp(rb.velocity, (new Vector2(x * speed, 0)), wallJumpLerp*Time.fixedDeltaTime );
         }
-            
+        if (Input.GetKeyDown(KeyCode.S) && coll.groundColl.gameObject.tag == "Platform")//跳下平台（魂斗罗）
+        {
+            coll.OpenPlatColl();
+        }
 
     }
 
-    void Airmovement()
+    void Airmovement()//跳跃**墙跳**挂墙**冲锋
     {
         if(jumpPress && coll.isOnGround)
         {
@@ -201,7 +202,7 @@ public class PlayerController : MonoBehaviour
         wallJumped = true;
     }
 
-    void WallSide()
+    void WallSide()//贴墙下滑
     {
         if (!canMove)
             return;
@@ -264,6 +265,10 @@ public class PlayerController : MonoBehaviour
 
     void PhysicsCheck()
     {
+        if(coll.isOnWall)
+        {
+            hasDashed = false;
+        }
         if (coll.isOnGround && !groundTouch)
         {
             GroundTouch();
@@ -300,4 +305,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
+    
+  
 }

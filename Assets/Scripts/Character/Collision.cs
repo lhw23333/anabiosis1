@@ -20,6 +20,7 @@ public class Collision : MonoBehaviour
     public Vector2 bottomOffset, rightOffset, leftOffset;
     private Color debugCollisionColor = Color.red;
 
+    public Collider2D groundColl;//跳下平台
     // Start is called before the first frame update
     void Start()
     {
@@ -29,7 +30,8 @@ public class Collision : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer))
+        groundColl = Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer);
+        if (groundColl)
         {
             isOnGround = true;
         }
@@ -44,6 +46,19 @@ public class Collision : MonoBehaviour
         isOnRightWall = Physics2D.OverlapCircle((Vector2)transform.position + rightOffset, collisionRadius, groundLayer);
         isOnLeftWall = Physics2D.OverlapCircle((Vector2)transform.position + leftOffset, collisionRadius, groundLayer);
         wallSide = isOnRightWall ? -1 : 1;
+    }
+    
+    public void OpenPlatColl()//调转通道方向
+    {
+        StartCoroutine(OpenPlat());
+    }
+
+    IEnumerator OpenPlat()
+    {
+        Collider2D collider = groundColl;
+        collider.gameObject.GetComponent<PlatformEffector2D>().rotationalOffset = 180;
+        yield return new WaitForSeconds(0.5f);
+        collider.gameObject.GetComponent<PlatformEffector2D>().rotationalOffset = 0;
     }
 
     void SetOnGround()
