@@ -18,15 +18,21 @@ public class SwingAxe : MonoBehaviour
 		audioSource = GetComponent<AudioSource>();
 
 		float currentAngle = transform.rotation.eulerAngles.z;
-
+       
 		timeModifier = Mathf.Abs(currentAngle) / halfArcPerSecond;
-		swingSize = Mathf.Abs(currentAngle);
-
+        if (currentAngle >= 180)
+            swingSize = currentAngle - 360;
+        else
+            swingSize = currentAngle;
+        //swingSize = Mathf.Abs(currentAngle);
+      
 		if (currentAngle > 0f)
 			direction = 1;
 		else
 			direction = -1;
-	}
+
+        Debug.Log(transform.rotation.eulerAngles.z);
+    }
 
 	void Update()
 	{
@@ -35,7 +41,7 @@ public class SwingAxe : MonoBehaviour
 		if (elapsedTime >= 1f)
 			elapsedTime -= 1f;
 
-		float angle = swingPattern.Evaluate(elapsedTime) * swingSize * direction;
+		float angle = swingPattern.Evaluate(elapsedTime) * swingSize *direction;
 
 		if (angle < angleForAudio && angle > -angleForAudio)
 			audioSource.Play();
@@ -43,5 +49,8 @@ public class SwingAxe : MonoBehaviour
 		Vector3 rot = transform.rotation.eulerAngles;
 		rot.z = angle;
 		transform.rotation = Quaternion.Euler(rot);
+
+        Debug.Log(swingSize);
+       
 	}
 }

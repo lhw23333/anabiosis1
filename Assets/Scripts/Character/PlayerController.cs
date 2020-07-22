@@ -1,13 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerController : MonoBehaviour
 {
-   
-    
+
+
     [Header("移动参数")]
-    private Rigidbody2D rb; 
+    private Rigidbody2D rb;
     private float x;
     private float y;
     private float xRaw;
@@ -35,36 +36,43 @@ public class PlayerController : MonoBehaviour
     public bool jumpPress;
     public bool catchPress;
     public bool dashPress;
+    public bool jumpDownPress;
 
-    
 
     [Header("环境检测")]
     public Collision coll;
     public float footOffset;
-    public float groundDistansce ;
+    public float groundDistansce;
 
     private bool groundTouch;//限制二次冲锋
-
-
-
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         coll = GetComponent<Collision>();
+
+
+       
+       
+        //监听事件添加
+        EventCenter.Instance.AddEventListener("PlayerDead",PlayerDead);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space ))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             jumpPress = true;
         }
-        if(Input.GetKeyDown(KeyCode.K))
+        if (Input.GetKeyDown(KeyCode.K))
         {
             dashPress = true;
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            jumpDownPress = true;
         }
         catchPress = Input.GetKey(KeyCode.J);
     }
@@ -75,26 +83,27 @@ public class PlayerController : MonoBehaviour
         y = Input.GetAxis("Vertical");
         xRaw = Input.GetAxisRaw("Horizontal");
         yRaw = Input.GetAxisRaw("Vertical");
-     
+
         PhysicsCheck();
         GroundMovement();
         Airmovement();
         yVelocity = rb.velocity.y;
         jumpPress = false;
         dashPress = false;
+        jumpDownPress = false;
 
-        
 
-        if(isDashing)//冲锋残影
+
+        if (isDashing)//冲锋残影
             PoolManager.Instance.GetObj("Shadow");
-}
+    }
 
-    
+
 
 
     void GroundMovement()//地面移动**空中移动**冲刺后的速度转化**跳下平台
     {
-        
+
         if (!canMove)
             return;
         if (!wallJumped)
@@ -103,12 +112,12 @@ public class PlayerController : MonoBehaviour
                 rb.velocity = new Vector2(speed * x, rb.velocity.y);
             else
                 rb.velocity = new Vector2(airSpeed * x, rb.velocity.y);
-        }          
+        }
         else
         {
-            rb.velocity = Vector2.Lerp(rb.velocity, (new Vector2(x * speed, 0)), wallJumpLerp*Time.fixedDeltaTime );
+            rb.velocity = Vector2.Lerp(rb.velocity, (new Vector2(x * speed, 0)), wallJumpLerp * Time.fixedDeltaTime);
         }
-        if (Input.GetKeyDown(KeyCode.S) && coll.groundColl.gameObject.tag == "Platform")//跳下平台（魂斗罗）
+        if (jumpDownPress && coll.groundColl.gameObject.tag == "Platform")//跳下平台（魂斗罗）
         {
             coll.OpenPlatColl();
         }
@@ -117,43 +126,43 @@ public class PlayerController : MonoBehaviour
 
     void Airmovement()//跳跃**墙跳**挂墙**冲锋
     {
-        if(jumpPress && coll.isOnGround)
+        if (jumpPress && coll.isOnGround)
         {
             Jump(Vector2.up);
         }
-            
 
-        if(coll.isOnWall && !coll.isOnGround)
+
+        if (coll.isOnWall && !coll.isOnGround)
         {
-            if(x!=0)
+            if (x != 0)
             {
                 if (Input.GetKey(KeyCode.J))
                 {
-                    rb.bodyType = RigidbodyType2D.Static;
+                    //rb.bodyType = RigidbodyType2D.Static;
                 }
                 else
                 {
-                    rb.bodyType = RigidbodyType2D.Dynamic;
+                    //rb.bodyType = RigidbodyType2D.Dynamic;
                     WallSide();
 
                 }
-                    
-            }           
+
+            }
         }
         if (coll.isOnWall && !coll.isOnGround && jumpPress)
         {
-            rb.bodyType = RigidbodyType2D.Dynamic;
+            //rb.bodyType = RigidbodyType2D.Dynamic;
             WallJump();
         }
-         
-        if(dashPress && !hasDashed)
-        {               
-             if (xRaw != 0 || yRaw != 0)
-                Dash(xRaw, yRaw);           
+
+        if (dashPress && !hasDashed)
+        {
+            if (xRaw != 0 || yRaw != 0)
+                Dash(xRaw, yRaw);
         }
-        
-        
-       
+
+
+
     }
 
     void Dash(float x, float y)
@@ -182,12 +191,12 @@ public class PlayerController : MonoBehaviour
         wallJumped = false;
         isDashing = false;
 
-        
+
     }
 
     IEnumerator GroundDash()//地面多次冲刺
     {
-        yield return new WaitForSeconds(.15f);
+        yield return new WaitForSeconds(.25f);
         if (coll.isOnGround)
             hasDashed = false;
     }
@@ -200,6 +209,8 @@ public class PlayerController : MonoBehaviour
 
         Jump(Vector2.up / 1.5f + wallDir / 1.5f);
         wallJumped = true;
+
+        GetComponent<BetterJumping>().enabled = true;
     }
 
     void WallSide()//贴墙下滑
@@ -207,7 +218,7 @@ public class PlayerController : MonoBehaviour
         if (!canMove)
             return;
         bool pushingWall = false;
-        if((rb.velocity.x > 0 && coll.isOnRightWall) || (rb.velocity.x < 0 && coll.isOnLeftWall))
+        if ((rb.velocity.x > 0 && coll.isOnRightWall) || (rb.velocity.x < 0 && coll.isOnLeftWall))
         {
             pushingWall = true;
         }
@@ -265,9 +276,9 @@ public class PlayerController : MonoBehaviour
 
     void PhysicsCheck()
     {
-        if(coll.isOnWall)
+        if (coll.isOnWall)
         {
-            hasDashed = false;
+            //hasDashed = false;    //是否开启贴墙冲刺
         }
         if (coll.isOnGround && !groundTouch)
         {
@@ -280,7 +291,7 @@ public class PlayerController : MonoBehaviour
             groundTouch = false;
         }
 
-        if(coll.isOnGround && !isDashing)
+        if (coll.isOnGround && !isDashing)
         {
             wallJumped = false;
             GetComponent<BetterJumping>().enabled = true;
@@ -305,6 +316,22 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Trap")
+        {
+            EventCenter.Instance.EventTrigger("PlayerDead", "player");
+
+        }
+    }
+   
+
+   public void PlayerDead(object info)
+   {
+        Debug.Log("PlayerDead" + info);
+   }
+    
 
     
   
