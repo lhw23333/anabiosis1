@@ -211,6 +211,8 @@ public class PlayerController : MonoBehaviour
         wallJumped = true;
 
         GetComponent<BetterJumping>().enabled = true;
+
+        hasDashed = false; //贴墙跳一次后可以冲刺
     }
 
     void WallSide()//贴墙下滑
