@@ -31,7 +31,7 @@ public class SwingAxe : MonoBehaviour
 		else
 			direction = -1;
 
-        Debug.Log(transform.rotation.eulerAngles.z);
+
     }
 
 	void Update()
@@ -50,7 +50,7 @@ public class SwingAxe : MonoBehaviour
 		rot.z = angle;
 		transform.rotation = Quaternion.Euler(rot);
 
-        Debug.Log(swingSize);
+
        
 	}
 }

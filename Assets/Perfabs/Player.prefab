@@ -135,17 +135,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5306f7c03cb85664e8f85231ca67327a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 15
+  wallJumpLerp: 5
+  speed: 22
+  airSpeed: 17
   slideSpeed: 0.5
+  dashSpeed: 50
   canMove: 1
+  isDashing: 0
+  hasDashed: 0
+  wallJumped: 0
   yVelocity: 0
-  jumpForce: 30
+  jumpForce: 25
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
   wallJumpForce: {x: 80, y: 80}
   jumpPress: 0
   catchPress: 0
+  dashPress: 0
+  jumpDownPress: 0
   coll: {fileID: 0}
   footOffset: 0.8
   groundDistansce: 1
@@ -174,6 +182,7 @@ MonoBehaviour:
   bottomOffset: {x: 0, y: -0.64}
   rightOffset: {x: 0.8, y: 0}
   leftOffset: {x: -0.8, y: 0}
+  groundColl: {fileID: 0}
 --- !u!114 &5287720111969911757
 MonoBehaviour:
   m_ObjectHideFlags: 0

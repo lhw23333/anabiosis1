@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-    public void test()
+    private void Start()
     {
-        MusicMgr.Instance.PlayBkMusic("Main");
-        Debug.Log("asd");
+        EventCenter.Instance.AddEventListener("Collection", Collect);
     }
-    
+
+    void Collect(object info)
+    {
+        Debug.Log(info);
+    }
+
 }

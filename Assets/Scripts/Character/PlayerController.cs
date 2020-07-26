@@ -55,8 +55,7 @@ public class PlayerController : MonoBehaviour
 
        
        
-        //监听事件添加
-        EventCenter.Instance.AddEventListener("PlayerDead",PlayerDead);
+        
     }
 
     // Update is called once per frame
@@ -103,24 +102,45 @@ public class PlayerController : MonoBehaviour
 
     void GroundMovement()//地面移动**空中移动**冲刺后的速度转化**跳下平台
     {
+        
 
         if (!canMove)
             return;
-        if (!wallJumped)
+        /*if (!wallJumped)
         {
-            if (coll.isOnGround)
+            //if (coll.isOnGround)
                 rb.velocity = new Vector2(speed * x, rb.velocity.y);
-            else
-                rb.velocity = new Vector2(airSpeed * x, rb.velocity.y);
+            //else
+               // rb.velocity = new Vector2(airSpeed * x, rb.velocity.y);
         }
         else
         {
+            if(isDashing)
             rb.velocity = Vector2.Lerp(rb.velocity, (new Vector2(x * speed, 0)), wallJumpLerp * Time.fixedDeltaTime);
         }
-        if (jumpDownPress && coll.groundColl.gameObject.tag == "Platform")//跳下平台（魂斗罗）
+        */
+        if(!wallJumped)
+        {
+            rb.velocity = new Vector2(speed * x, rb.velocity.y);
+        }       
+        else
+        {
+            if(!isDashing)
+
+            rb.velocity = new Vector2(speed * x, rb.velocity.y);
+        }
+
+        if (isDashing)
+        {
+            rb.velocity = Vector2.Lerp(rb.velocity, (new Vector2(x * speed, 0)), wallJumpLerp * Time.fixedDeltaTime);
+            Debug.Log("asd");
+        }
+
+
+        /*if (jumpDownPress && coll.groundColl.gameObject.tag == "Platform")//跳下平台（魂斗罗）
         {
             coll.OpenPlatColl();
-        }
+        }*/
 
     }
 
@@ -173,6 +193,7 @@ public class PlayerController : MonoBehaviour
         rb.velocity += dir.normalized * dashSpeed;
 
         StartCoroutine(DashWait());
+        
     }
 
     IEnumerator DashWait()//设置冲刺重力
@@ -203,14 +224,14 @@ public class PlayerController : MonoBehaviour
 
     void WallJump()
     {
-        StartCoroutine(DisableMovement(0.2f));
+        StartCoroutine(DisableMovement(0.3f));
 
         Vector2 wallDir = coll.isOnRightWall ? Vector2.left : Vector2.right;
 
         Jump(Vector2.up / 1.5f + wallDir / 1.5f);
         wallJumped = true;
 
-        GetComponent<BetterJumping>().enabled = true;
+        //GetComponent<BetterJumping>().enabled = true;
 
         hasDashed = false; //贴墙跳一次后可以冲刺
     }
@@ -323,16 +344,13 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.tag == "Trap")
         {
-            EventCenter.Instance.EventTrigger("PlayerDead", "player");
+            EventCenter.Instance.EventTrigger("PlayerDead", "");
 
         }
     }
    
 
-   public void PlayerDead(object info)
-   {
-        Debug.Log("PlayerDead" + info);
-   }
+   
     
 
     

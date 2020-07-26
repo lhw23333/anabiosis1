@@ -5,7 +5,7 @@ using UnityEngine;
 public class TpManager : BaseManager<TpManager>
 {
 
-    public int timer = 3;
+    public int timer = 4;
 
     public bool isCanTp = true;
 
